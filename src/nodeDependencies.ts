@@ -81,7 +81,7 @@ const toArray = (obj: {[x: string]: any}): {name: string, config: any}[] => {
   const arr = [];
   // 默认配置项
   let commonConfig = {
-    isDebug: true, // 是否为调试模式
+    isDebug: false, // 是否为调试模式
     host: '192.168.1.1', //板子ip地址，可以通过setRemoteip方式设定修改，不固定，L1
     username: '', // ssh登录用户名，这里设置的内容无效，固化到插件程序中root，固定，L2
     password: '', // ssh登录密码，这里设置的内容无效，固化到插件程序中root，固定，L3
