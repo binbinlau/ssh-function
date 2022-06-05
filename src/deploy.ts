@@ -2,9 +2,9 @@ const fs = require('fs');
 const archiver = require('archiver');
 const childProcess = require('child_process');
 import { NodeSSH } from "node-ssh";
-import {  DeployConfigItem } from "./nodeDependencies";
-import { getFileName, oConsole, RUN_MODEL_NAME, DEBUG_MODEL_NAME } from "./utils";
 import * as vscode from 'vscode';
+import { DeployConfigItem } from "./nodeDependencies";
+import { getFileName, oConsole } from "./utils";
 
 const { log, error, succeed, info, underline, } = oConsole;
 
@@ -23,15 +23,18 @@ export class Deploy {
     this.callback = callback;
     this.ssh = new NodeSSH();
     this.taskList = [
-      { task: this.checkConfig, tip: "配置检查", increment: 0, async: false },
+      // { task: this.checkConfig, tip: "配置检查", increment: 0, async: false },
+
       // { task: this.execBuild, tip: "打包", increment: 10 },
       // { task: this.buildZip, tip: "压缩文件", increment: 30, async: false },
+
       { task: this.connectSSH, tip: "连接服务器", increment: 10, async: false },
-      { task: this.stopRunCommand, tip: "停止远程旧程序", increment: 20, async: false },
-      { task: this.removeRemoteFile1, tip: "删除服务器文件", increment: 30, async: false },
-      { task: this.uploadLocalFile1, tip: "上传文件至服务器", increment: 60, async: false },
-      { task: this.modefyFileAccess, tip: "修改文件权限", increment: 80, async: false },
+      // { task: this.stopRunCommand, tip: "停止远程旧程序", increment: 20, async: false },
+      // { task: this.removeRemoteFile1, tip: "删除服务器文件", increment: 30, async: false },
+      // { task: this.uploadLocalFile1, tip: "上传文件至服务器", increment: 60, async: false },
+      // { task: this.modefyFileAccess, tip: "修改文件权限", increment: 80, async: false },
       { task: this.sartRunCommand, tip: "启动远程运行程序", increment: 90, async: false },
+
       // { task: this.unzipRemoteFile, tip: "解压服务器文件", increment: 70, async: false },
       // { task: this.execuCustomScript, tip: "执行自定义命令", increment: 80, async: false },
       { task: this.disconnectSSH, tip: "断开服务器", increment: 90, async: false },
@@ -146,6 +149,7 @@ export class Deploy {
       archive.finalize();
     });
   };
+  
   // 3. 连接服务器
   connectSSH = () => {
     const { config } = this;
@@ -170,15 +174,18 @@ export class Deploy {
   stopRunCommand = () => {
     const { config } = this;
     var result;
-    this.ssh.execCommand(config.drectrunModeStopCmd).then(undefined, (reason: any) => {
+    log('停止远程旧程序:' + config.debugModeStopCmd + '、' + config.drectrunModeStopCmd + '、' + JSON.stringify(config.cwd));
+    this.ssh.execCommand(config.drectrunModeStopCmd, { cwd: config.cwd, execOptions: {env: "/bin/ash", pty: true}}).then((reason: any) => {
       if (config.isDebug) {
-        vscode.window.showErrorMessage('run model stop error: ' + reason);
+        vscode.window.showErrorMessage('run model stop info: ' + JSON.stringify(reason));
       }
+      vscode.window.activeTerminal?.sendText('111111111' + JSON.stringify(reason));
     });
-    this.ssh.execCommand(config.debugModeStopCmd).then(undefined, (reason: any) => {
+    this.ssh.execCommand(config.debugModeStopCmd, { cwd: config.cwd, execOptions: { env: "/bin/ash", pty: true } }).then((reason: any) => {
       if (config.isDebug) {
-        vscode.window.showErrorMessage('debug model stop error' + reason);
+        vscode.window.showErrorMessage('debug model stop info' + JSON.stringify(reason));
       }
+      vscode.window.activeTerminal?.sendText('222222222' + JSON.stringify(reason));
     });
   };
 
@@ -256,19 +263,27 @@ export class Deploy {
   sartRunCommand = () => {
     const { config } = this;
     var result = '没有可执行任务';
-    if (this.model === RUN_MODEL_NAME) {
-      return this.ssh.execCommand(config.drectrunModeStartCmd).then(undefined, (reason: any) => {
-        if (config.isDebug) {
-          vscode.window.showErrorMessage('run model start error: ' + reason);
-        }
-      });
-    } else if (this.model === DEBUG_MODEL_NAME) {
-      return this.ssh.execCommand(config.debugModeStartCmd).then(undefined, (reason: any) => {
-        if (config.isDebug) {
-          vscode.window.showErrorMessage('debug model start error' + reason);
-        }
-      });
-    }
+    log('启动远程运行程序: ' + this.model + '(' + config.debugModeStartCmd + '、' + config.drectrunModeStartCmd + '、' + JSON.stringify(config.cwd) + ')');
+    this.ssh.exec("touch /root/test11.log", []).then((reason: any) => {
+      if (reason.stderr) {
+        vscode.window.activeTerminal?.sendText(JSON.stringify(reason.stderr));
+      }
+    });
+    // if (this.model === RUN_MODEL_NAME) {
+    //   return this.ssh.execCommand(config.drectrunModeStartCmd, { cwd: config.cwd, execOptions: { env: "/bin/ash", pty: true } }).then((reason: any) => {
+    //     if (config.isDebug) {
+    //       vscode.window.showErrorMessage('run model start info: ' + JSON.stringify(reason));
+    //     }
+    //     vscode.window.activeTerminal?.sendText(JSON.stringify(reason));
+    //   });
+    // } else if (this.model === DEBUG_MODEL_NAME) {
+    //   return this.ssh.execCommand(config.debugModeStartCmd, { cwd: config.cwd, execOptions: { env: "/bin/ash", pty: true } }).then((reason: any) => {
+    //     if (config.isDebug) {
+    //       vscode.window.showErrorMessage('debug model start info' + JSON.stringify(reason));
+    //     }
+    //     vscode.window.activeTerminal?.sendText(JSON.stringify(reason));
+    //   });
+    // }
     return result;
   };
 

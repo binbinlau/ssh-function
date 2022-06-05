@@ -1,8 +1,16 @@
+/*
+ * @Author: liubinp liubinp@yonyou.com
+ * @Date: 2022-05-18 18:41:22
+ * @LastEditors: liubinp liubinp@yonyou.com
+ * @LastEditTime: 2022-05-20 13:40:53
+ * @FilePath: \GDeploy\src\extension.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+import { readFileSync, writeFile, writeFileSync } from 'fs';
 import * as vscode from 'vscode';
 import { uploadEntry } from './events/uploadEntry';
 import { DepNodeProvider } from './nodeDependencies';
 import { validateIP } from './utils';
-import { readFileSync, writeFileSync, writeFile } from 'fs';
 
 class InputBoxOptions implements vscode.InputBoxOptions {
 	placeHolder: string = "请输入远程IP";
@@ -15,6 +23,14 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerTreeDataProvider('nodeDependencies', nodeDependenciesProvider);
 	vscode.commands.registerCommand('nodeDependencies.refreshEntry', () => nodeDependenciesProvider.refresh());
 	vscode.commands.registerCommand('nodeDependencies.uploadEntry', uploadEntry);
+	vscode.commands.registerCommand('copyLibraryCommand', () => {
+		// 将固定命令复制到粘贴板 -exec set solib-search-path C:\\Project\\Controllers\\GUP3p0\\Source\\Controller\\Release
+		const util = require('util');
+		// require('child_process').spawn('clip').stdin.end(util.inspect(`-exec set solib-search-path C:\\Project\\Controllers\\GUP3p0\\Source\\Controller\\Release`));
+		require('child_process').spawn('clip').stdin.end('-exec set solib-search-path C:\\Project\\Controllers\\GUP3p0\\Source\\Controller\\Release');
+
+		vscode.window.showInformationMessage('复制命令成功!');
+	});
 	vscode.commands.registerCommand('setRemoteIp', () => {
 		vscode.window.showInputBox(new InputBoxOptions(), undefined).then((ip: string | undefined) => {
 			if (ip) {
@@ -23,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
 					let config = readFileSync(vscode.workspace.rootPath + '/.vscode/deploy.config', 'utf8');
 					let launchConfig = readFileSync(vscode.workspace.rootPath + '/.vscode/launch.json', 'utf8');
 					config = config.replace(new RegExp("host:.*\,", "g"), `host: '${ip}',`);
-					launchConfig = launchConfig.replace(new RegExp("\"target\":.*\:", "g"), `"target": "${ip}:`);
+					launchConfig = launchConfig.replace(new RegExp("\"miDebuggerServerAddress\":.*\:", "g"), `"miDebuggerServerAddress": "${ip}:`);
 
 					writeFileSync(vscode.workspace.rootPath + '/.vscode/launch.json', launchConfig);
 					writeFile(vscode.workspace.rootPath + '/.vscode/deploy.config', config, (err) => {

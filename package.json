@@ -1,6 +1,6 @@
 {
   "name": "ssh",
-  "displayName": "RSSH",
+  "displayName": "iPLC SSH",
   "description": "一个扩展插件，支持ssh上传",
   "publisher": "lb",
   "icon": "media/worker.png",
@@ -22,6 +22,15 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "copyLibraryCommand",
+        "title": "动态库命令",
+        "category": "ssh",
+        "icon": {
+          "light": "resources/copy_light.svg",
+          "dark": "resources/copy_dark.svg"
+        }
+      },
       {
         "command": "setRemoteIp",
         "title": "设置远程IP",
@@ -53,14 +62,19 @@
     "menus": {
       "view/title": [
         {
+          "command": "copyLibraryCommand",
+          "when": "view == nodeDependencies",
+          "group": "navigation@2"
+        },
+        {
           "command": "setRemoteIp",
           "when": "view == nodeDependencies",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "nodeDependencies.refreshEntry",
           "when": "view == nodeDependencies",
-          "group": "navigation"
+          "group": "navigation@3"
         }
       ],
       "view/item/context": [
@@ -115,9 +129,9 @@
   },
   "dependencies": {
     "archiver": "^5.0.2",
-    "chalk": "^4.1.0",
+    "chalk": "^4.1.2",
     "inquirer": "^7.3.3",
-    "node-ssh": "^11.1.1",
+    "node-ssh": "^12.0.4",
     "ora": "^5.1.0"
   },
   "repository": {}

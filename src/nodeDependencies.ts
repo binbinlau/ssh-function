@@ -1,8 +1,6 @@
-import * as vscode from "vscode";
-import * as fs from 'fs';
 import * as path from 'path';
-import { Deploy } from "./deploy";
-import {RUN_MODEL_NAME, DEBUG_MODEL_NAME} from "./utils";
+import * as vscode from "vscode";
+import { DEBUG_MODEL_NAME, RUN_MODEL_NAME } from "./utils";
 
 export class DepNodeProvider implements vscode.TreeDataProvider<Dependency> {
   // workspaceRoot 当前工作区根路径
@@ -87,11 +85,11 @@ const toArray = (obj: {[x: string]: any}): {name: string, config: any}[] => {
     password: '', // ssh登录密码，这里设置的内容无效，固化到插件程序中root，固定，L3
     readyTimeout: 5000, //ssh连接超时时间设置，固定，L4
 
-    distPathRte: 'C:/iplc-debug-windcon/control_debug_files/rte/dpu', // 电脑上存放rte程序的目录及程序名，固定，L5
-    distPathWtcso: 'C:/Project/Controllers/GUP3p0/Source/Controller/Release/libwtc.so', // 电脑上存放wtc动态库的目录及程序名，固定，L6
+    // distPathRte: 'C:/iplc-debug-windcon/control_debug_files/rte/dpu', // 电脑上存放rte程序的目录及程序名，固定，L5
+    // distPathWtcso: 'C:/Project/Controllers/GUP3p0/Source/Controller/Release/libwtc.so', // 电脑上存放wtc动态库的目录及程序名，固定，L6
 
-    // distPathRte: 'C:/MyWork/GDeploy-master/src/test1.ts',
-    // distPathWtcso: 'C:/MyWork/GDeploy-master/src/test2.ts',
+    distPathRte: 'E:\\MyGit\\c_worker\\test_so_localdebug_cpt\\use\\main.c',
+    distPathWtcso: 'E:\\MyGit\\c_worker\\test_so_localdebug_cpt\\lib\\main.exe',
 
     remotePathRte: '/edpf/bin', // 板子上存放rte程序的目录，固定，L7
     remotePathWtcso: '/edpf/lib', // 板子上存放wtc动态库的目录，固定，L8
@@ -99,18 +97,24 @@ const toArray = (obj: {[x: string]: any}): {name: string, config: any}[] => {
 
   let runModelConfigName = RUN_MODEL_NAME;
   let runModelConfig = {
-    drectrunModeStopCmd:'/edpf/bin/cipc -a', // 直接运行模式停止旧程序命令，固定，L9
-    drectrunModeStartCmd:'/edpf/bin/run', // 直接运行模式启动新程序命令，固定，L10
-    // drectrunModeStopCmd:'echo "drectrunModeStopCmd" >> /root/testCommand.txt', // 直接运行模式停止旧程序命令，固定，L9
-    // drectrunModeStartCmd:'echo "drectrunModeStartCmd" >> /root/testCommand.txt', // 直接运行模式启动新程序命令，固定，L10
+    // cwd: "/edpf/bin",
+    // drectrunModeStopCmd:'sh /root/stop.sh', // 直接运行模式停止旧程序命令，固定，L9
+    // drectrunModeStartCmd:'sh run', // 直接运行模式启动新程序命令，固定，L10
+    
+    cwd: "/home",
+    drectrunModeStopCmd:'sh test', // 直接运行模式停止旧程序命令，固定，L9
+    drectrunModeStartCmd:'sh test', // 直接运行模式启动新程序命令，固定，L10
   };
 
   let debugModelConfigName = DEBUG_MODEL_NAME;
   let debugModelConfig = {
-    debugModeStopCmd:'/edpf/bin/cipcDebug -a', // 上传文件准备调试模式停止旧程序命令，固定，L11
-    debugModeStartCmd:'/edpf/bin/runDebug', // 上传文件准备调试模式启动新程序命令，固定，L12
-    // debugModeStopCmd:'echo "debugModeStopCmd" >> /root/testCommand.txt', // 上传文件准备调试模式停止旧程序命令，固定，L11
-    // debugModeStartCmd:'echo "debugModeStartCmd" >> /root/testCommand.txt', // 上传文件准备调试模式启动新程序命令，固定，L12
+    // cwd: "/edpf/bin",
+    // debugModeStopCmd:'sh /root/stop.sh', // 上传文件准备调试模式停止旧程序命令，固定，L11
+    // debugModeStartCmd:'sh runDebug', // 上传文件准备调试模式启动新程序命令，固定，L12
+
+    cwd: "/home",
+    debugModeStopCmd:'sh test', // 上传文件准备调试模式停止旧程序命令，固定，L11
+    debugModeStartCmd:'sh test', // 上传文件准备调试模式启动新程序命令，固定，L12
   };
 
   let hasCommonNode = false;
@@ -164,6 +168,8 @@ export interface DeployConfigItem {
 
   remotePathRte: string; // 远程主机项目源码路径
   remotePathWtcso: string; // 远程主机项目动态库路径
+
+  cwd: string; // 执行目录
 
   drectrunModeStopCmd: string; // 直接运行模式停止旧程序命令
   drectrunModeStartCmd: string; // 直接运行模式启动新程序命令

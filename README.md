@@ -34,5 +34,3 @@ module.exports = config;
 | scripts    | 构建代码命令                    |
 | distPath   | 打包文件夹名称, 默认 dist        |
 | privateKey | 秘钥地址 🔑                     |
-
-

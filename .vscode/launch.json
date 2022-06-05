@@ -9,7 +9,7 @@
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
-			"target": "212.64.47.12:6666",
+			"miDebuggerServerAddress": "212.64.47.13:6666",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
