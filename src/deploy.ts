@@ -4,7 +4,8 @@ const childProcess = require('child_process');
 import { NodeSSH } from "node-ssh";
 import * as vscode from 'vscode';
 import { DeployConfigItem } from "./nodeDependencies";
-import { getFileName, oConsole } from "./utils";
+import { DEBUG_MODEL_NAME, getFileName, oConsole, RUN_MODEL_NAME } from "./utils";
+const dgram = require('dgram');
 
 const { log, error, succeed, info, underline, } = oConsole;
 
@@ -29,10 +30,10 @@ export class Deploy {
       // { task: this.buildZip, tip: "压缩文件", increment: 30, async: false },
 
       { task: this.connectSSH, tip: "连接服务器", increment: 10, async: false },
-      // { task: this.stopRunCommand, tip: "停止远程旧程序", increment: 20, async: false },
+      { task: this.stopRunCommand, tip: "停止远程旧程序", increment: 20, async: false },
       // { task: this.removeRemoteFile1, tip: "删除服务器文件", increment: 30, async: false },
-      // { task: this.uploadLocalFile1, tip: "上传文件至服务器", increment: 60, async: false },
-      // { task: this.modefyFileAccess, tip: "修改文件权限", increment: 80, async: false },
+      { task: this.uploadLocalFile1, tip: "上传文件至服务器", increment: 60, async: false },
+      { task: this.modefyFileAccess, tip: "修改文件权限", increment: 80, async: false },
       { task: this.sartRunCommand, tip: "启动远程运行程序", increment: 90, async: false },
 
       // { task: this.unzipRemoteFile, tip: "解压服务器文件", increment: 70, async: false },
@@ -66,10 +67,10 @@ export class Deploy {
         }
         log("--------执行成功-------");
         this.callback(true);
-        vscode.window.showInformationMessage(`上传成功(${host})`, "知道了");
+        vscode.window.showInformationMessage(`下载成功(${host})`, "知道了");
       } catch (err) {
         this.callback(false);
-        vscode.window.showInformationMessage(`上传失败(${host})：${err}`, "知道了");
+        vscode.window.showInformationMessage(`下载失败(${host})：${err}`, "知道了");
         error(`${schedule}失败:`);
         error(err);
       }
@@ -175,18 +176,24 @@ export class Deploy {
     const { config } = this;
     var result;
     log('停止远程旧程序:' + config.debugModeStopCmd + '、' + config.drectrunModeStopCmd + '、' + JSON.stringify(config.cwd));
-    this.ssh.execCommand(config.drectrunModeStopCmd, { cwd: config.cwd, execOptions: {env: "/bin/ash", pty: true}}).then((reason: any) => {
+    // this.excuteSSHCommand(config.drectrunModeStopCmd);
+    result = this.ssh.execCommand(config.drectrunModeStopCmd).then((reason: any) => {
       if (config.isDebug) {
         vscode.window.showErrorMessage('run model stop info: ' + JSON.stringify(reason));
+        vscode.window.activeTerminal?.sendText('111111111' + JSON.stringify(reason));
       }
-      vscode.window.activeTerminal?.sendText('111111111' + JSON.stringify(reason));
+    }).catch((reason: any) => {
+      log('reason: ' + reason);
     });
-    this.ssh.execCommand(config.debugModeStopCmd, { cwd: config.cwd, execOptions: { env: "/bin/ash", pty: true } }).then((reason: any) => {
+    result = this.ssh.execCommand(config.debugModeStopCmd).then((reason: any) => {
       if (config.isDebug) {
         vscode.window.showErrorMessage('debug model stop info' + JSON.stringify(reason));
+        vscode.window.activeTerminal?.sendText('222222222' + JSON.stringify(reason));
       }
-      vscode.window.activeTerminal?.sendText('222222222' + JSON.stringify(reason));
+    }).catch((reason: any) => {
+      log('reason2: ' + reason);
     });
+    return result;
   };
 
   // 删除远程文件
@@ -237,8 +244,8 @@ export class Deploy {
   uploadLocalFile1 = () => {
     const { config } = this;
     const { remotePathRte, remotePathWtcso, distPathRte, distPathWtcso} = config;
-    log(`5.1 上传本地文件 ${underline(remotePathRte + '/' + getFileName(distPathRte))}`);
-    log(`5.2 上传本地文件 ${underline(remotePathWtcso + '/' + getFileName(distPathWtcso))}`);
+    log(`5.1 上传本地文件 ${underline(distPathRte + remotePathRte + '/' + getFileName(distPathRte))}`);
+    log(`5.2 上传本地文件 ${underline(distPathWtcso + remotePathWtcso + '/' + getFileName(distPathWtcso))}`);
     var result;
     result = this.ssh.putFile(distPathRte, remotePathRte + '/' + getFileName(distPathRte), null, {
       concurrency: 1
@@ -259,31 +266,86 @@ export class Deploy {
     return result;
   };
 
+  sendUdpCommand = (command: string) => {
+    const { config } = this;
+    var udp_client = dgram.createSocket('udp4');
+    udp_client.on('close',function(){
+      console.log('udp client closed.')
+    });
+    udp_client.on('error', function () {
+      console.log('some error on udp client.')
+    });
+
+    udp_client.on('message', function (msg: string, rinfo: any) {
+      console.log(`receive message from ${rinfo.address}:${rinfo.port}：${msg}`);
+    });
+
+    var SendBuff = command;
+    var SendLen = SendBuff.length;
+    udp_client.send(SendBuff, 0, SendLen, 8888, config.host); 
+
+  };
+
+  excuteSSHCommand = (command: string) => {
+    const { config } = this;
+    let address: string = config.host;
+    let username: string = "root";
+    let password: string = "root";
+    let auth = {
+      host: address,
+      username: username,
+      password: password
+    };
+
+    let config2 = {
+      auth: auth,
+      postDeploy: [command],
+      silent: false
+    };
+    console.log('====== config2' + JSON.stringify(config2));
+    const simpleSSHDeploy = require('simple-ssh-deploy');
+    simpleSSHDeploy(config2).then((success: any) => {
+      console.log('====== success' + JSON.stringify(success));
+    }).catch((error: any) => {
+        console.log('======= error' + JSON.stringify(error));
+    });
+  };
+
   // 执行开始程序命令
   sartRunCommand = () => {
     const { config } = this;
     var result = '没有可执行任务';
     log('启动远程运行程序: ' + this.model + '(' + config.debugModeStartCmd + '、' + config.drectrunModeStartCmd + '、' + JSON.stringify(config.cwd) + ')');
-    this.ssh.exec("touch /root/test11.log", []).then((reason: any) => {
-      if (reason.stderr) {
-        vscode.window.activeTerminal?.sendText(JSON.stringify(reason.stderr));
-      }
-    });
-    // if (this.model === RUN_MODEL_NAME) {
-    //   return this.ssh.execCommand(config.drectrunModeStartCmd, { cwd: config.cwd, execOptions: { env: "/bin/ash", pty: true } }).then((reason: any) => {
-    //     if (config.isDebug) {
-    //       vscode.window.showErrorMessage('run model start info: ' + JSON.stringify(reason));
-    //     }
-    //     vscode.window.activeTerminal?.sendText(JSON.stringify(reason));
-    //   });
-    // } else if (this.model === DEBUG_MODEL_NAME) {
-    //   return this.ssh.execCommand(config.debugModeStartCmd, { cwd: config.cwd, execOptions: { env: "/bin/ash", pty: true } }).then((reason: any) => {
-    //     if (config.isDebug) {
-    //       vscode.window.showErrorMessage('debug model start info' + JSON.stringify(reason));
-    //     }
-    //     vscode.window.activeTerminal?.sendText(JSON.stringify(reason));
-    //   });
-    // }
+
+
+    if (this.model === RUN_MODEL_NAME) {
+      // return this.ssh.execCommand(config.drectrunModeStartCmd, { cwd: config.cwd, execOptions: { env: "/bin/sh", pty: true } }).then((reason: any) => {
+      //   if (config.isDebug) {
+      //     vscode.window.showErrorMessage('run model start info: ' + JSON.stringify(reason));
+      //   }
+      //   vscode.window.activeTerminal?.sendText(JSON.stringify(reason));
+      // });
+      // return new Promise((resolve, reject) =>{
+      //   this.sendUdpCommand();
+      // });
+      this.sendUdpCommand("startRun");
+    } else if (this.model === DEBUG_MODEL_NAME) {
+      // return this.ssh.execCommand(config.debugModeStartCmd).then((result: any) => {
+      //   console.log('====================================================')
+      // }, (reason: SSHExecCommandResponse) => {
+      //   if (reason.code) {
+      //     this.disconnectSSH();
+      //   }
+      //   if (config.isDebug) {
+      //     vscode.window.showErrorMessage('debug model start info' + JSON.stringify(reason));
+      //     vscode.window.activeTerminal?.sendText('debug model start info' + JSON.stringify(reason));
+      //   }
+      // }).catch((reason: any) => {
+      //   console.log("reason3: " + reason);
+      // });
+      // this.excuteSSHCommand(config.debugModeStartCmd);
+      this.sendUdpCommand("startDebug");
+    }
     return result;
   };
 

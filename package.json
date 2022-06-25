@@ -1,7 +1,7 @@
 {
   "name": "ssh",
   "displayName": "iPLC SSH",
-  "description": "一个扩展插件，支持ssh上传",
+  "description": "一个扩展插件，支持ssh下载",
   "publisher": "lb",
   "icon": "media/worker.png",
   "keywords": [
@@ -51,11 +51,20 @@
       },
       {
         "command": "nodeDependencies.uploadEntry",
-        "title": "上传",
+        "title": "下载",
         "category": "ssh",
         "icon": {
-          "light": "resources/upload_light.svg",
-          "dark": "resources/upload_dark.svg"
+          "light": "resources/upload_light.gif",
+          "dark": "resources/upload_dark.gif"
+        }
+      },
+      {
+        "command": "nodeDependencies.selfCommand",
+        "title": "下载",
+        "category": "ssh",
+        "icon": {
+          "light": "resources/upload_light.gif",
+          "dark": "resources/upload_dark.gif"
         }
       }
     ],
@@ -132,7 +141,8 @@
     "chalk": "^4.1.2",
     "inquirer": "^7.3.3",
     "node-ssh": "^12.0.4",
-    "ora": "^5.1.0"
+    "ora": "^5.1.0",
+    "simple-ssh-deploy": "^1.0.1"
   },
   "repository": {}
 }

@@ -1,4 +1,11 @@
-import * as vscode from "vscode";
+/*
+ * @Author: liubinp liubinp@yonyou.com
+ * @Date: 2022-06-22 23:29:53
+ * @LastEditors: liubinp liubinp@yonyou.com
+ * @LastEditTime: 2022-06-22 23:43:08
+ * @FilePath: \ssh-function\src\utils.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import chalk = require("chalk");
 
 export const oConsole = {
@@ -49,5 +56,5 @@ export const validateIP = function(ip: string) {
 };
 
 
-export const RUN_MODEL_NAME = '上传文件直接运行';
-export const DEBUG_MODEL_NAME = '上传文件准备调试';
+export const RUN_MODEL_NAME = '下载文件直接运行';
+export const DEBUG_MODEL_NAME = '准备调试';
