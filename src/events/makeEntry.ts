@@ -2,23 +2,22 @@
  * @Author: liubinp liubinp@yonyou.com
  * @Date: 2022-06-22 23:29:53
  * @LastEditors: liubinp liubinp@yonyou.com
- * @LastEditTime: 2022-06-26 22:39:59
+ * @LastEditTime: 2022-06-26 23:02:51
  * @FilePath: \ssh-function\src\events\uploadEntry.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import * as vscode from 'vscode';
-import { Deploy } from "../deploy";
-import { Dependency } from "../nodeDependencies";
-
+import { Make } from "../make";
+import { MakeItem } from '../makeItem';
 
 let loading = false;
 
 /**
- * 上传事件
- * @param dependency
+ * 编译事件
+ * @param makeEvent
  */
-export const uploadEntry = (dependency: Dependency) => {
-  if (!dependency) {
+export const makeEntry = (makeEvent: MakeItem) => {
+  if (!makeEvent) {
     return;
   }
   if (loading) {
@@ -26,7 +25,7 @@ export const uploadEntry = (dependency: Dependency) => {
     return;
   }
   loading = true;
-  new Deploy(dependency.label, dependency.config, dependency.workspaceRoot, () => {
-    loading = false;
+  new Make(makeEvent.commandType, makeEvent.label, makeEvent.workspaceRoot, (flag: boolean) => {
+    loading = flag;
   });
 };

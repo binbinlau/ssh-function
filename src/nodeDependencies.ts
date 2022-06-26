@@ -39,13 +39,18 @@ export class DepNodeProvider implements vscode.TreeDataProvider<Dependency> {
     if (element) {
       return Promise.resolve([]);
     } else {
+      let flagConfig: any = null;
       const configList = toArray(this.getDeployConfig()).map((item) =>{
+        if (!flagConfig) {
+          flagConfig = item.config;
+        }
         return new Dependency(item.name, item.config.host, 0, item.config, this.workspaceRoot, {
           title: "打包上传",
           command: "nodeDependencies.uploadEntry",
           tooltip: ""
         });
       });
+
       return Promise.resolve(configList);
     }
   }
@@ -62,8 +67,8 @@ export class Dependency extends vscode.TreeItem {
 		public readonly command?: vscode.Command
 	) {
 		super(label, collapsibleState);
-
-		this.tooltip = `服务器：${this.label} 地址：${this.version}`;
+    
+    this.tooltip = `服务器：${this.label} 地址：${this.version}`;
 		this.description = this.version;
 	}
 

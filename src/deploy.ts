@@ -9,7 +9,6 @@ const dgram = require('dgram');
 
 const { log, error, succeed, info, underline, } = oConsole;
 
-
 export class Deploy {
   model: string;
   config: DeployConfigItem;
@@ -43,12 +42,13 @@ export class Deploy {
     ];
     this.start();
   }
+
   start = async () => {
     log("--------开始执行-------");
     const { host } = this.config;
     const progressOptions = {
       location: vscode.ProgressLocation.Notification,
-      title: `打包上传(${host})`,
+      title: `下载(${host})`,
     };
     vscode.window.withProgress(progressOptions, async (progress, token) => {
       let schedule = "";
@@ -268,21 +268,21 @@ export class Deploy {
 
   sendUdpCommand = (command: string) => {
     const { config } = this;
-    var udp_client = dgram.createSocket('udp4');
-    udp_client.on('close',function(){
-      console.log('udp client closed.')
+    var udpClient = dgram.createSocket('udp4');
+    udpClient.on('close',function(){
+      console.log('udp client closed.');
     });
-    udp_client.on('error', function () {
-      console.log('some error on udp client.')
+    udpClient.on('error', function () {
+      console.log('some error on udp client.');
     });
 
-    udp_client.on('message', function (msg: string, rinfo: any) {
+    udpClient.on('message', function (msg: string, rinfo: any) {
       console.log(`receive message from ${rinfo.address}:${rinfo.port}：${msg}`);
     });
 
-    var SendBuff = command;
-    var SendLen = SendBuff.length;
-    udp_client.send(SendBuff, 0, SendLen, 8888, config.host); 
+    var sendBuff = command;
+    var sendLen = sendBuff.length;
+    udpClient.send(sendBuff, 0, sendLen, 8888, config.host); 
 
   };
 

@@ -1,7 +1,7 @@
 {
   "name": "ssh",
-  "displayName": "iPLC SSH",
-  "description": "一个扩展插件，支持ssh下载",
+  "displayName": "IPLC C语言程序编译及下载",
+  "description": "扩展插件，支持C语言程序的编译及下载",
   "publisher": "lb",
   "icon": "media/worker.png",
   "keywords": [
@@ -17,7 +17,8 @@
   ],
   "activationEvents": [
     "*",
-    "onView:nodeDependencies"
+    "onView:nodeDependencies",
+    "onView:makeViews"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -55,16 +56,16 @@
         "category": "ssh",
         "icon": {
           "light": "resources/upload_light.gif",
-          "dark": "resources/upload_dark.gif"
+          "dark": "resources/upload_light.gif"
         }
       },
       {
-        "command": "nodeDependencies.selfCommand",
-        "title": "下载",
+        "command": "makeViews.selfCommand",
+        "title": "本地编译",
         "category": "ssh",
         "icon": {
-          "light": "resources/upload_light.gif",
-          "dark": "resources/upload_dark.gif"
+          "light": "resources/exec_light.png",
+          "dark": "resources/exec_dark.png"
         }
       }
     ],
@@ -88,6 +89,11 @@
       ],
       "view/item/context": [
         {
+          "command": "makeViews.selfCommand",
+          "when": "view == makeViews",
+          "group": "inline"
+        },
+        {
           "command": "nodeDependencies.uploadEntry",
           "when": "view == nodeDependencies",
           "group": "inline"
@@ -98,7 +104,7 @@
       "activitybar": [
         {
           "id": "package-explorer",
-          "title": "ssh服务",
+          "title": "程序编译及下载",
           "icon": "media/dep.svg"
         }
       ]
@@ -106,8 +112,14 @@
     "views": {
       "package-explorer": [
         {
+          "id": "makeViews",
+          "name": "本地编译",
+          "icon": "media/dep.svg",
+          "contextualTitle": "本地编译"
+        },
+        {
           "id": "nodeDependencies",
-          "name": "ssh服务",
+          "name": "程序下载",
           "icon": "media/dep.svg",
           "contextualTitle": "ssh服务"
         }
@@ -142,7 +154,7 @@
     "inquirer": "^7.3.3",
     "node-ssh": "^12.0.4",
     "ora": "^5.1.0",
-    "simple-ssh-deploy": "^1.0.1"
+    "sudo-prompt": "^9.2.1"
   },
   "repository": {}
 }

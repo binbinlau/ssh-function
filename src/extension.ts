@@ -2,13 +2,15 @@
  * @Author: liubinp liubinp@yonyou.com
  * @Date: 2022-05-18 18:41:22
  * @LastEditors: liubinp liubinp@yonyou.com
- * @LastEditTime: 2022-05-20 13:40:53
+ * @LastEditTime: 2022-06-26 21:32:34
  * @FilePath: \GDeploy\src\extension.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import { readFileSync, writeFile, writeFileSync } from 'fs';
 import * as vscode from 'vscode';
+import { makeEntry } from './events/makeEntry';
 import { uploadEntry } from './events/uploadEntry';
+import { MakeNodeProvider } from './makeItem';
 import { DepNodeProvider } from './nodeDependencies';
 import { validateIP } from './utils';
 
@@ -20,9 +22,12 @@ class InputBoxOptions implements vscode.InputBoxOptions {
 export function activate(context: vscode.ExtensionContext) {
 	console.log("---------------组件激活😄---------------");
 	const nodeDependenciesProvider = new DepNodeProvider(vscode.workspace.rootPath || "");
+	const makeDependenciesProvider = new MakeNodeProvider(vscode.workspace.rootPath || "");
 	vscode.window.registerTreeDataProvider('nodeDependencies', nodeDependenciesProvider);
+	vscode.window.registerTreeDataProvider('makeViews', makeDependenciesProvider);
 	vscode.commands.registerCommand('nodeDependencies.refreshEntry', () => nodeDependenciesProvider.refresh());
 	vscode.commands.registerCommand('nodeDependencies.uploadEntry', uploadEntry);
+	vscode.commands.registerCommand('makeViews.selfCommand', makeEntry);
 	vscode.commands.registerCommand('copyLibraryCommand', () => {
 		// 将固定命令复制到粘贴板 -exec set solib-search-path C:\\Project\\Controllers\\GUP3p0\\Source\\Controller\\Release
 		const util = require('util');
