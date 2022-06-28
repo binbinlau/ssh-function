@@ -2,12 +2,13 @@
  * @Author: liubinp liubinp@yonyou.com
  * @Date: 2022-05-18 18:41:22
  * @LastEditors: liubinp liubinp@yonyou.com
- * @LastEditTime: 2022-06-26 21:32:34
+ * @LastEditTime: 2022-06-29 01:11:37
  * @FilePath: \GDeploy\src\extension.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import { readFileSync, writeFile, writeFileSync } from 'fs';
 import * as vscode from 'vscode';
+// import { CustomBuildTaskProvider } from './customTaskProvider';
 import { makeEntry } from './events/makeEntry';
 import { uploadEntry } from './events/uploadEntry';
 import { MakeNodeProvider } from './makeItem';
@@ -18,9 +19,12 @@ class InputBoxOptions implements vscode.InputBoxOptions {
 	placeHolder: string = "请输入远程IP";
 }
 
+// let customTaskProvider: vscode.Disposable | undefined;
+
 // 激活事件
 export function activate(context: vscode.ExtensionContext) {
 	console.log("---------------组件激活😄---------------");
+	// customTaskProvider = vscode.tasks.registerTaskProvider(CustomBuildTaskProvider.CustomBuildScriptType, new CustomBuildTaskProvider(vscode.workspace.rootPath || ""));
 	const nodeDependenciesProvider = new DepNodeProvider(vscode.workspace.rootPath || "");
 	const makeDependenciesProvider = new MakeNodeProvider(vscode.workspace.rootPath || "");
 	vscode.window.registerTreeDataProvider('nodeDependencies', nodeDependenciesProvider);
@@ -36,6 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		vscode.window.showInformationMessage('复制命令成功!');
 	});
+	
 	vscode.commands.registerCommand('setRemoteIp', () => {
 		vscode.window.showInputBox(new InputBoxOptions(), undefined).then((ip: string | undefined) => {
 			if (ip) {
@@ -71,4 +76,7 @@ export function activate(context: vscode.ExtensionContext) {
 // 销毁周期
 export function deactivate() {
 	console.log("---------------銷毀😀---------------");
+	// if (customTaskProvider) {
+	// 	customTaskProvider.dispose();
+	// }
 }
