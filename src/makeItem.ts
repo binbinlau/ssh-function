@@ -2,7 +2,7 @@
  * @Author: liubinp liubinp@yonyou.com
  * @Date: 2022-06-26 20:28:01
  * @LastEditors: liubinp liubinp@yonyou.com
- * @LastEditTime: 2022-06-26 21:30:46
+ * @LastEditTime: 2022-06-29 22:35:11
  * @FilePath: \ssh-function\src\makeItem.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -37,17 +37,17 @@ export class MakeNodeProvider implements vscode.TreeDataProvider<MakeItem> {
       return Promise.resolve([]);
     } else {
       const configList = [];
-      const makeCleanItem = new MakeItem('clean', "清除编译中间文件", '', 0, this.workspaceRoot, {
+      const makeCleanItem = new MakeItem('clean', "clean清除中间文件", '', 0, this.workspaceRoot, {
         title: "make clean",
         command: "makeViews.selfCommand",
         tooltip: ""
       });
-      const makeBuildItem = new MakeItem('build', "仅编译改动", '', 0, this.workspaceRoot, {
+      const makeBuildItem = new MakeItem('build', "build仅编译改动", '', 0, this.workspaceRoot, {
         title: "make build",
         command: "makeViews.selfCommand",
         tooltip: ""
       });
-      const makeReBuildItem = new MakeItem('rebuild', "全部重新编译", '', 0, this.workspaceRoot, {
+      const makeReBuildItem = new MakeItem('rebuild', "rebuild全部重新编译", '', 0, this.workspaceRoot, {
         title: "make rebuild",
         command: "makeViews.selfCommand",
         tooltip: ""

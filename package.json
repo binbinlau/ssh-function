@@ -115,13 +115,17 @@
           "id": "makeViews",
           "name": "本地编译",
           "icon": "media/dep.svg",
-          "contextualTitle": "本地编译"
+          "contextualTitle": "本地编译",
+          "visibility":"visible",
+          "type": "tree"
         },
         {
           "id": "nodeDependencies",
           "name": "程序下载",
           "icon": "media/dep.svg",
-          "contextualTitle": "ssh服务"
+          "contextualTitle": "程序下载",
+          "visibility":"visible",
+          "type": "tree"
         }
       ]
     }

@@ -2,16 +2,12 @@
  * @Author: liubinp liubinp@yonyou.com
  * @Date: 2022-06-26 20:49:45
  * @LastEditors: liubinp liubinp@yonyou.com
- * @LastEditTime: 2022-06-29 01:24:10
+ * @LastEditTime: 2022-06-29 21:14:35
  * @FilePath: \ssh-function\src\make.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-const fs = require('fs');
-const archiver = require('archiver');
-const childProcess = require('child_process');
 import * as vscode from 'vscode';
 import { oConsole } from "./utils";
-const dgram = require('dgram');
 var sudo = require('sudo-prompt');
 var options = {
   name: 'Build Project',
@@ -29,18 +25,21 @@ export class Make {
     this.callback = callback;
     if (commandType === 'clean') {
       // this.makeClean();
-      vscode.commands.executeCommand("workbench.action.tasks.runTask", "clean the rte and solib");
+      vscode.commands.executeCommand("workbench.action.tasks.runTask", "clean");
       this.callback(false);
     } else if (commandType === 'build') {
-      vscode.commands.executeCommand("workbench.action.tasks.runTask", "build the rte and solib");
+      vscode.commands.executeCommand("workbench.action.tasks.runTask", "build");
       this.callback(false);
       // this.makeBuild();
     } else if (commandType === 'rebuild') {
-      vscode.commands.executeCommand("workbench.action.tasks.runTask", "rebuild the rte and solib");
+      vscode.commands.executeCommand("workbench.action.tasks.runTask", "rebuild");
       this.callback(false);
       // this.makeReBuild();
     } else if (commandType === 'release') {
-      this.makeRelease();
+      vscode.commands.executeCommand("workbench.action.tasks.runTask", "release");
+      this.callback(false);
+    } else {
+      vscode.window.showErrorMessage('task.json 配置中无该任务，请配置tabel为 clean、build、rebuild、release 的任务');
     }
   }
 
