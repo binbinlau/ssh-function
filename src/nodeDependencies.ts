@@ -57,6 +57,9 @@ export class DepNodeProvider implements vscode.TreeDataProvider<Dependency> {
 
 }
 
+/**
+ * 上传文件项数据模型
+ */
 export class Dependency extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
@@ -72,7 +75,12 @@ export class Dependency extends vscode.TreeItem {
 		this.description = this.version;
 	}
 
-	iconPath = {
+ /**
+  * 配置项按钮图片资源路径设置
+  *
+  * @memberof Dependency
+  */
+ iconPath = {
 		light: path.join(__filename, '..', '..', 'resources', 'server_light.svg'),
 		dark: path.join(__filename, '..', '..', 'resources', 'server_dark.svg')
 	};
@@ -155,6 +163,9 @@ const toArray = (obj: {[x: string]: any}): {name: string, config: any}[] => {
 
 export interface DeployConfig {[x: string]: DeployConfigItem}
 
+/**
+ * 配置文件支持项
+ */
 export interface DeployConfigItem {
   isDebug: boolean, // 调试模式
   host: string; // 服务器地址

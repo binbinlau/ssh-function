@@ -266,6 +266,10 @@ export class Deploy {
     return result;
   };
 
+  /**
+   * udp客户端实现
+   * @param command 
+   */
   sendUdpCommand = (command: string) => {
     const { config } = this;
     var udpClient = dgram.createSocket('udp4');
@@ -319,31 +323,8 @@ export class Deploy {
 
 
     if (this.model === RUN_MODEL_NAME) {
-      // return this.ssh.execCommand(config.drectrunModeStartCmd, { cwd: config.cwd, execOptions: { env: "/bin/sh", pty: true } }).then((reason: any) => {
-      //   if (config.isDebug) {
-      //     vscode.window.showErrorMessage('run model start info: ' + JSON.stringify(reason));
-      //   }
-      //   vscode.window.activeTerminal?.sendText(JSON.stringify(reason));
-      // });
-      // return new Promise((resolve, reject) =>{
-      //   this.sendUdpCommand();
-      // });
       this.sendUdpCommand("startRun");
     } else if (this.model === DEBUG_MODEL_NAME) {
-      // return this.ssh.execCommand(config.debugModeStartCmd).then((result: any) => {
-      //   console.log('====================================================')
-      // }, (reason: SSHExecCommandResponse) => {
-      //   if (reason.code) {
-      //     this.disconnectSSH();
-      //   }
-      //   if (config.isDebug) {
-      //     vscode.window.showErrorMessage('debug model start info' + JSON.stringify(reason));
-      //     vscode.window.activeTerminal?.sendText('debug model start info' + JSON.stringify(reason));
-      //   }
-      // }).catch((reason: any) => {
-      //   console.log("reason3: " + reason);
-      // });
-      // this.excuteSSHCommand(config.debugModeStartCmd);
       this.sendUdpCommand("startDebug");
     }
     return result;

@@ -116,7 +116,7 @@
           "name": "本地编译",
           "icon": "media/dep.svg",
           "contextualTitle": "本地编译",
-          "visibility":"visible",
+          "visibility": "visible",
           "type": "tree"
         },
         {
@@ -124,7 +124,7 @@
           "name": "程序下载",
           "icon": "media/dep.svg",
           "contextualTitle": "程序下载",
-          "visibility":"visible",
+          "visibility": "visible",
           "type": "tree"
         }
       ]
@@ -158,7 +158,8 @@
     "inquirer": "^7.3.3",
     "node-ssh": "^12.0.4",
     "ora": "^5.1.0",
-    "sudo-prompt": "^9.2.1"
+    "sudo-prompt": "^9.2.1",
+    "yarn": "^1.22.19"
   },
   "repository": {}
 }

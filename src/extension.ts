@@ -35,7 +35,6 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('copyLibraryCommand', () => {
 		// 将固定命令复制到粘贴板 -exec set solib-search-path C:\\Project\\Controllers\\GUP3p0\\Source\\Controller\\Release
 		const util = require('util');
-		// require('child_process').spawn('clip').stdin.end(util.inspect(`-exec set solib-search-path C:\\Project\\Controllers\\GUP3p0\\Source\\Controller\\Release`));
 		require('child_process').spawn('clip').stdin.end('-exec set solib-search-path C:\\Project\\Controllers\\GUP3p0\\Source\\Controller\\Release');
 
 		vscode.window.showInformationMessage('复制命令成功!');
