@@ -159,7 +159,7 @@ export class Deploy {
 
     } else {
       config.username = 'root';
-      config.password = 'root';
+      config.password = 'edpf';
     }
     log(`3. 连接服务器： ${underline(config.host)}`);
     return new Promise((resolve, reject) =>{
